@@ -1,0 +1,7 @@
+flask==3.0.3
+Flask-WTF==1.2.1
+Flask-SQLAlchemy==3.1.1
+Flask-Login==0.6.3
+requests==2.32.3
+Werkzeug==3.0.4
+email_validator==2.2.0

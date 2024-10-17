@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Welcome, {{ current_user.username }}!</h2>
+<p>This is your dashboard. You can upload memes or manage your collections from here.</p>
+
+<a href="{{ url_for('upload_meme') }}">Upload a New Meme</a>
+{% endblock %}
