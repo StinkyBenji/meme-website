@@ -13,3 +13,7 @@ class LoginForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Login')
+
+class UploadMemeForm(FlaskForm):
+    meme = FileField('Upload Meme', validators=[DataRequired()])
+    submit = SubmitField('Upload')
