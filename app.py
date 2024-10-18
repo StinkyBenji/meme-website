@@ -38,10 +38,21 @@ def allowed_file(filename):
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
-        hashed_password = generate_password_hash(form.password.data)
-        user = User(username=form.username.data, email=form.email.data, password=hashed_password)
-        db.session.add(user)
+        # Check if the username or email already exists
+        existing_user = User.query.filter(
+            (User.username == form.username.data) | 
+            (User.email == form.email.data)
+        ).first()
+
+        if existing_user:
+            flash('Username or email already taken. Please choose a different one.', 'danger')
+            return redirect(url_for('register'))
+
+        hashed_password = generate_password_hash(form.password.data, method='pbkdf2:sha256', salt_length=16)
+        new_user = User(username=form.username.data, email=form.email.data, password=hashed_password)
+        db.session.add(new_user)
         db.session.commit()
+        
         flash('Your account has been created! You can now log in.', 'success')
         return redirect(url_for('login'))
     return render_template('register.html', form=form)
@@ -50,12 +61,21 @@ def register():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
+        # Look up the user by email
         user = User.query.filter_by(email=form.email.data).first()
+
+        # Check if the user exists and the password is correct
         if user and check_password_hash(user.password, form.password.data):
+            # Log the user in
             login_user(user)
-            return redirect(url_for('dashboard'))
+            flash(f'Welcome back, {user.username}!', 'success')
+            
+            # Redirect to the next page if it exists, or the dashboard
+            next_page = request.args.get('next')
+            return redirect(next_page) if next_page else redirect(url_for('dashboard'))
+        
         else:
-            flash('Login unsuccessful. Please check email and password.', 'danger')
+            flash('Login unsuccessful. Please check your email and password.', 'danger')
     return render_template('login.html', form=form)
 
 @app.route('/logout')
