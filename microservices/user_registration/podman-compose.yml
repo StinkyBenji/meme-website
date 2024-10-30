@@ -1,0 +1,28 @@
+version: 3.7
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    ports:
+      - "5432:5432"
+    volumes: 
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=user_service
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=user_db
+
+  user_registration:
+    container_name: user-registration-service
+    image: user-registration-service:latest
+    build:
+      context: .
+      dockerfile: Containerfile
+    depends_on:
+      - postgres
+    ports:
+      - "8081:8081"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://user_service:password@postgres/user_db
+volumes:
+  postgres_data: 
